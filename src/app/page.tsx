@@ -1,29 +1,11 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '../../prisma/prisma';
-import DoneTodo from './DoneTodo';
-
-// next フォームの input 要素のリセット
+import DoneTodo from './components/todos/DoneTodo';
+import AddTodo from '../app/components/todos/AddTodo';
+import { deleteTodo, doneTodo } from '../api';
 
 const Page = async () => {
   const todos = await prisma.todo.findMany();
-
-  const addTodo = async (data: FormData) => {
-    'use server';
-    const name = data.get('name') as string;
-    await prisma.todo.create({data: {name}});
-    revalidatePath("/")
-  };
-
-  const deleteTodo = async (data: FormData) => {
-    'use server';
-    const id = data.get('id') as string;
-    await prisma.todo.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-    revalidatePath('/')
-  };
 
   return (
     <div className="m-8">
@@ -50,16 +32,7 @@ const Page = async () => {
           </li>
         ))}
       </ul>
-      <form className="flex items-center mt-4" action={addTodo}>
-        <label htmlFor="name">Name:</label>
-        <input type="text" name="name" className="border mx-2 p-1" />
-        <button
-          type="submit"
-          className="bg-blue-600 px-2 py-1 rounded-lg text-sm text-white"
-        >
-          Add Todo
-        </button> 
-      </form>
+      <AddTodo />
     </div>
   );
 };
